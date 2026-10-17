@@ -1,0 +1,564 @@
+blueprint:
+  name: Date Everything! Hector (range hood voice lines)
+  description: |-
+    Your range hood talks like Hector: lines when the fan turns on and off, when the kitchen gets smoky (and a nudge to turn him on if he's off), when the air clears, when the filter is full and when it gets cleaned. Made for Samsung range hoods in SmartThings, but any fan works for the on/off lines.
+
+    The clips are not included. Make them with the free cutting tool and upload them to Media > My media > date_everything. Guide: https://github.com/SeriousBug/date-everything-home-assistant
+  domain: automation
+  author: Ari Barmore-Genc
+  homeassistant:
+    min_version: 2024.10.0
+  source_url: https://github.com/SeriousBug/date-everything-home-assistant/blob/main/blueprints/automation/hector.yaml
+  input:
+    fan:
+      name: Range hood fan
+      description: Hector's fan entity.
+      selector:
+        entity:
+          filter:
+            domain: fan
+    speakers:
+      name: Speakers
+      description: Where Hector talks. Pick your kitchen speaker.
+      selector:
+        entity:
+          filter:
+            domain: media_player
+          multiple: true
+    options:
+      name: Options
+      icon: mdi:fan
+      input:
+        air_quality:
+          name: Air quality index sensor (optional)
+          description: SmartThings "Air quality" sensor (1 = good, 4 = bad).
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: sensor
+        aq_level:
+          name: Smoky at this air quality index or higher
+          default: 3
+          selector:
+            number:
+              min: 1
+              max: 4
+              step: 1
+              unit_of_measurement: ''
+              mode: box
+        pm25_concern:
+          name: PM2.5 health concern sensor (optional)
+          description: Reacts faster than the air quality index while you cook.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: sensor
+        filter_usage:
+          name: Filter usage sensor (optional)
+          description: Percent of filter life used.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: sensor
+        filter_alert_at:
+          name: Remind about the filter at
+          default: 100
+          selector:
+            number:
+              min: 50
+              max: 100
+              step: 1
+              unit_of_measurement: '%'
+              mode: box
+        filter_button:
+          name: Filter reset button (optional)
+          description: Pressing it plays a thank-you line.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: button
+        long_minutes:
+          name: '"Still running" line after'
+          default: 90
+          selector:
+            number:
+              min: 15
+              max: 480
+              step: 1
+              unit_of_measurement: min
+              mode: box
+        onoff_on:
+          name: Fan on and off lines
+          default: true
+          selector:
+            boolean: {}
+        air_on:
+          name: Smoky air lines
+          default: true
+          selector:
+            boolean: {}
+        filter_on:
+          name: Filter lines
+          default: true
+          selector:
+            boolean: {}
+        long_on:
+          name: Still running line
+          default: true
+          selector:
+            boolean: {}
+        folder:
+          name: Clip folder
+          description: Folder in Media > My media where you uploaded the clips.
+          default: date_everything
+          selector:
+            text: {}
+    lines:
+      name: Voice lines
+      icon: mdi:account-voice
+      collapsed: true
+      input:
+        on_clips:
+          name: Fan turns on
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_on_at_your_service.mp3, hector_on_here_you_are.mp3, hector_on_hello_again.mp3, hector_on_rush_of_air.mp3, hector_on_you_returned.mp3, hector_on_whatever_you_need.mp3, hector_on_serve_you.mp3, hector_on_welcome_to_stop_by.mp3, hector_on_breathing_freedom.mp3
+          selector:
+            text:
+              multiline: true
+        off_clips:
+          name: Fan turns off
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_off_come_back_any_time.mp3, hector_off_whenever_ready.mp3, hector_off_through_the_grates.mp3, hector_off_always_here.mp3, hector_off_speak_again_soon.mp3, hector_off_goodbye_now.mp3, hector_off_rest_in_contentment.mp3, hector_off_take_your_time.mp3
+          selector:
+            text:
+              multiline: true
+        air_clips:
+          name: Smoky air, fan running
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_air_storm_brewing.mp3, hector_air_play_of_air.mp3, hector_air_so_much_energy.mp3, hector_air_intensity.mp3
+          selector:
+            text:
+              multiline: true
+        nudge_clips:
+          name: Smoky air, fan off (turn me on!)
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_nudge_doesnt_sound_good.mp3, hector_nudge_let_me_care.mp3, hector_nudge_need_to_care.mp3, hector_nudge_how_can_i_help.mp3, hector_nudge_worst_fear.mp3
+          selector:
+            text:
+              multiline: true
+        clear_clips:
+          name: Air cleared
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_clear_light_and_space.mp3, hector_on_breathing_freedom.mp3, hector_off_rest_in_contentment.mp3
+          selector:
+            text:
+              multiline: true
+        filter_clips:
+          name: Filter is full
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_filter_full_of_dust.mp3, hector_filter_simple_matter.mp3
+          selector:
+            text:
+              multiline: true
+        filter_done_clips:
+          name: Filter cleaned
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_filter_thanks_fresh_filter.mp3, hector_filter_tired_filter.mp3, hector_filter_conscientious.mp3, hector_filter_have_filters_for_that.mp3
+          selector:
+            text:
+              multiline: true
+        long_clips:
+          name: Still running
+          description: File names, separated by commas. One is picked at random each time.
+          default: hector_long_wait_here.mp3, hector_long_buttons_dials.mp3
+          selector:
+            text:
+              multiline: true
+    hours:
+      name: Quiet hours
+      icon: mdi:sleep
+      collapsed: true
+      input:
+        awake_from:
+          name: Talk from (weekdays)
+          default: 09:00:00
+          selector:
+            time: {}
+        weekend_awake_from:
+          name: Talk from (Saturday and Sunday)
+          default: '11:00:00'
+          selector:
+            time: {}
+        awake_until:
+          name: Stop talking at
+          description: Can be after midnight, like 03:00.
+          default: 03:00:00
+          selector:
+            time: {}
+mode: parallel
+max: 10
+max_exceeded: silent
+trigger_variables:
+  aq: !input 'air_quality'
+  aq_level: !input 'aq_level'
+  pm: !input 'pm25_concern'
+  fu: !input 'filter_usage'
+  filter_alert_at: !input 'filter_alert_at'
+triggers:
+- trigger: state
+  entity_id: !input 'fan'
+  from: 'off'
+  to: 'on'
+  id: fan_on
+- trigger: state
+  entity_id: !input 'fan'
+  from: 'on'
+  to: 'off'
+  id: fan_off
+- trigger: state
+  entity_id: !input 'fan'
+  to: 'on'
+  for:
+    minutes: !input 'long_minutes'
+  id: long
+- trigger: template
+  value_template: '{{ (aq != '''' and states(aq) | float(0) >= aq_level) or (pm != '''' and states(pm) in [''unhealthy'', ''very_unhealthy'', ''hazardous'']) }}'
+  for:
+    minutes: 1
+  id: air_bad
+- trigger: template
+  value_template: '{{ fu != '''' and states(fu) | float(0) >= filter_alert_at }}'
+  id: filter_full
+- trigger: template
+  value_template: '{{ fu != '''' and states(fu) not in [''unknown'', ''unavailable''] and states(fu) | float(100) < 10 }}'
+  id: filter_reset
+- trigger: event
+  event_type: state_changed
+  event_data:
+    entity_id: !input 'filter_button'
+  id: button
+variables:
+  speakers: !input 'speakers'
+  folder: !input 'folder'
+  awake_from: !input 'awake_from'
+  weekend_awake_from: !input 'weekend_awake_from'
+  awake_until: !input 'awake_until'
+  fan: !input 'fan'
+  air_on: !input 'air_on'
+  onoff_on: !input 'onoff_on'
+  filter_on: !input 'filter_on'
+  long_on: !input 'long_on'
+  on_clips: !input 'on_clips'
+  off_clips: !input 'off_clips'
+  air_clips: !input 'air_clips'
+  nudge_clips: !input 'nudge_clips'
+  clear_clips: !input 'clear_clips'
+  filter_clips: !input 'filter_clips'
+  filter_done_clips: !input 'filter_done_clips'
+  long_clips: !input 'long_clips'
+  aq: !input 'air_quality'
+  pm: !input 'pm25_concern'
+actions:
+- choose:
+  - conditions:
+    - condition: trigger
+      id: fan_on
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ onoff_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (on_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ on_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: fan_off
+    - alias: Ran at least a minute
+      condition: template
+      value_template: '{{ (now() - trigger.from_state.last_changed).total_seconds() >= 60 }}'
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ onoff_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (off_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ off_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: long
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ long_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (long_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ long_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: air_bad
+    sequence:
+    - condition: template
+      value_template: '{{ air_on }}'
+    - if:
+      - condition: state
+        entity_id: !input 'fan'
+        state: 'on'
+      then:
+      - if:
+        - condition: template
+          value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+        - condition: template
+          value_template: '{{ (air_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+        then:
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 45
+          continue_on_timeout: true
+        - variables:
+            clip: '{{ air_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+        - action: media_player.play_media
+          target:
+            entity_id: '{{ speakers }}'
+          data:
+            media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+            media_content_type: music
+          continue_on_error: true
+        - delay:
+            seconds: 2
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 60
+          continue_on_timeout: true
+      else:
+      - if:
+        - condition: template
+          value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+        - condition: template
+          value_template: '{{ (nudge_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+        then:
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 45
+          continue_on_timeout: true
+        - variables:
+            clip: '{{ nudge_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+        - action: media_player.play_media
+          target:
+            entity_id: '{{ speakers }}'
+          data:
+            media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+            media_content_type: music
+          continue_on_error: true
+        - delay:
+            seconds: 2
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 60
+          continue_on_timeout: true
+    - alias: Wait for the air to clear
+      wait_for_trigger:
+      - trigger: template
+        value_template: '{{ (aq == '''' or states(aq) | float(9) <= 2) and (pm == '''' or states(pm) in [''good'', ''moderate'']) and (aq != '''' or pm != '''') }}'
+        for:
+          minutes: 10
+      timeout:
+        hours: 4
+      continue_on_timeout: false
+    - if:
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (clear_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ clear_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: filter_full
+    sequence:
+    - condition: template
+      value_template: '{{ filter_on }}'
+    - alias: Say it the next time the fan turns on
+      wait_for_trigger:
+      - trigger: state
+        entity_id: !input 'fan'
+        from: 'off'
+        to: 'on'
+      timeout:
+        days: 14
+      continue_on_timeout: false
+    - delay:
+        seconds: 6
+    - if:
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (filter_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ filter_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: filter_reset
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ filter_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (filter_done_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ filter_done_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: button
+    - condition: template
+      value_template: '{{ trigger.event.data.old_state is not none and trigger.event.data.new_state is not none and trigger.event.data.old_state.state not in [''unavailable''] and trigger.event.data.new_state.state not in [''unavailable'', ''unknown''] and trigger.event.data.old_state.state != trigger.event.data.new_state.state }}'
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ filter_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (filter_done_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ filter_done_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true

@@ -1,0 +1,309 @@
+blueprint:
+  name: Date Everything! Dishy (dishwasher voice lines)
+  description: |-
+    Your dishwasher talks like Dishy. Intro and a start line when a real wash starts, the Lime Dawn line when the door pops open to dry, and a victory line when it finishes. Powering it on and off, or cancelling a cycle, stays silent. Made for Samsung dishwashers in SmartThings.
+
+    The clips are not included. Make them with the free cutting tool and upload them to Media > My media > date_everything. Guide: https://github.com/SeriousBug/date-everything-home-assistant
+  domain: automation
+  author: Ari Barmore-Genc
+  homeassistant:
+    min_version: 2024.10.0
+  source_url: https://github.com/SeriousBug/date-everything-home-assistant/blob/main/blueprints/automation/dishy.yaml
+  input:
+    machine:
+      name: Dishwasher machine state
+      description: SmartThings sensor called "Machine state" (run / pause / stop).
+      selector:
+        entity:
+          filter:
+            domain: sensor
+    job:
+      name: Dishwasher job state
+      description: SmartThings sensor called "Job state" (pre_wash / wash / rinse / drying / finish).
+      selector:
+        entity:
+          filter:
+            domain: sensor
+    speakers:
+      name: Speakers
+      description: Where Dishy talks. Pick your kitchen speaker.
+      selector:
+        entity:
+          filter:
+            domain: media_player
+          multiple: true
+    options:
+      name: Options
+      icon: mdi:dishwasher
+      input:
+        completion:
+          name: Completion time (optional)
+          description: SmartThings "Completion time" sensor. Needed for the door-opening line.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: sensor
+                device_class: timestamp
+        door_minutes:
+          name: Door line, minutes before the end
+          default: 5
+          selector:
+            number:
+              min: 1
+              max: 30
+              step: 1
+              unit_of_measurement: min
+              mode: box
+          description: Samsung dishwashers pop the door open near the end of drying.
+        course:
+          name: Cycle select (optional)
+          description: SmartThings "Cycle" select, to skip short cycles.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: select
+        skip_courses:
+          name: Cycles that stay silent
+          default: pre_blast, selfSanitize
+          selector:
+            text: {}
+        intro_on:
+          name: Intro line when a wash starts
+          default: true
+          selector:
+            boolean: {}
+        start_on:
+          name: Cycle start line
+          default: true
+          selector:
+            boolean: {}
+        door_on:
+          name: Door opening line (Lime Dawn)
+          default: true
+          selector:
+            boolean: {}
+        end_on:
+          name: Cycle finished line
+          default: true
+          selector:
+            boolean: {}
+        folder:
+          name: Clip folder
+          description: Folder in Media > My media where you uploaded the clips.
+          default: date_everything
+          selector:
+            text: {}
+    lines:
+      name: Voice lines
+      icon: mdi:account-voice
+      collapsed: true
+      input:
+        intro_clips:
+          name: Intro
+          description: File names, separated by commas. One is picked at random each time.
+          default: dishy_intro_my_name_is_dishy.mp3
+          selector:
+            text:
+              multiline: true
+        start_clips:
+          name: Cycle start
+          description: File names, separated by commas. One is picked at random each time.
+          default: dishy_start_basic_info.mp3, dishy_start_preferred_style.mp3, dishy_start_unleash_whirlpool.mp3, dishy_start_infinite_domination.mp3, dishy_start_dish_and_stain.mp3, dishy_start_hello_welcome.mp3, dishy_start_whirlpool_destruction.mp3, dishy_start_clean_wash_dry.mp3, dishy_start_wait_a_moment.mp3
+          selector:
+            text:
+              multiline: true
+        door_clips:
+          name: Door opens to dry
+          description: File names, separated by commas. One is picked at random each time.
+          default: dishy_door_lime_dawn.mp3
+          selector:
+            text:
+              multiline: true
+        end_clips:
+          name: Cycle finished
+          description: File names, separated by commas. One is picked at random each time.
+          default: dishy_end_great_at_dishes.mp3, dishy_end_great_at_dishes_long.mp3, dishy_end_well_done_human.mp3, dishy_end_job_well_done.mp3, dishy_end_cleanest_dishwear.mp3, dishy_end_clean_as_whistle.mp3, dishy_end_happy_cleansing.mp3, dishy_end_it_is_done.mp3, dishy_end_done_together.mp3, dishy_end_youre_welcome.mp3
+          selector:
+            text:
+              multiline: true
+    hours:
+      name: Quiet hours
+      icon: mdi:sleep
+      collapsed: true
+      input:
+        awake_from:
+          name: Talk from (weekdays)
+          default: 09:00:00
+          selector:
+            time: {}
+        weekend_awake_from:
+          name: Talk from (Saturday and Sunday)
+          default: '11:00:00'
+          selector:
+            time: {}
+        awake_until:
+          name: Stop talking at
+          description: Can be after midnight, like 03:00.
+          default: 03:00:00
+          selector:
+            time: {}
+mode: single
+max_exceeded: silent
+triggers:
+- trigger: state
+  entity_id: !input 'machine'
+  from: stop
+  to: run
+variables:
+  speakers: !input 'speakers'
+  folder: !input 'folder'
+  awake_from: !input 'awake_from'
+  weekend_awake_from: !input 'weekend_awake_from'
+  awake_until: !input 'awake_until'
+  machine: !input 'machine'
+  job: !input 'job'
+  completion: !input 'completion'
+  door_minutes: !input 'door_minutes'
+  course: !input 'course'
+  skip_courses: !input 'skip_courses'
+  intro_on: !input 'intro_on'
+  start_on: !input 'start_on'
+  door_on: !input 'door_on'
+  end_on: !input 'end_on'
+  intro_clips: !input 'intro_clips'
+  start_clips: !input 'start_clips'
+  door_clips: !input 'door_clips'
+  end_clips: !input 'end_clips'
+actions:
+- condition: template
+  value_template: '{{ course == '''' or states(course) not in (skip_courses.split('','') | map(''trim'') | list) }}'
+- if:
+  - condition: template
+    value_template: '{{ intro_on }}'
+  - condition: template
+    value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+  - condition: template
+    value_template: '{{ (intro_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+  then:
+  - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+    timeout:
+      seconds: 45
+    continue_on_timeout: true
+  - variables:
+      clip: '{{ intro_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+  - action: media_player.play_media
+    target:
+      entity_id: '{{ speakers }}'
+    data:
+      media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+      media_content_type: music
+    continue_on_error: true
+  - delay:
+      seconds: 2
+  - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+    timeout:
+      seconds: 60
+    continue_on_timeout: true
+- delay:
+    milliseconds: 1500
+- if:
+  - condition: template
+    value_template: '{{ start_on }}'
+  - condition: template
+    value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+  - condition: template
+    value_template: '{{ (start_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+  then:
+  - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+    timeout:
+      seconds: 45
+    continue_on_timeout: true
+  - variables:
+      clip: '{{ start_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+  - action: media_player.play_media
+    target:
+      entity_id: '{{ speakers }}'
+    data:
+      media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+      media_content_type: music
+    continue_on_error: true
+  - delay:
+      seconds: 2
+  - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+    timeout:
+      seconds: 60
+    continue_on_timeout: true
+- alias: Wait for the door to open, the finish, or a cancel
+  wait_template: '{{ (completion != '''' and is_state(machine, ''run'') and states(job) not in [''pre_wash'', ''unknown'', ''unavailable'', ''none''] and as_timestamp(states(completion), 0) > 0 and (as_timestamp(states(completion), 0) - now().timestamp()) <= door_minutes * 60) or is_state(job, ''finish'') or is_state(machine, ''stop'') }}'
+  timeout:
+    hours: 6
+  continue_on_timeout: false
+- if:
+  - condition: template
+    value_template: '{{ completion != '''' and is_state(machine, ''run'') and states(job) not in [''pre_wash'', ''unknown'', ''unavailable'', ''none''] and as_timestamp(states(completion), 0) > 0 and (as_timestamp(states(completion), 0) - now().timestamp()) <= door_minutes * 60 }}'
+  then:
+  - if:
+    - condition: template
+      value_template: '{{ door_on }}'
+    - condition: template
+      value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+    - condition: template
+      value_template: '{{ (door_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+    then:
+    - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+      timeout:
+        seconds: 45
+      continue_on_timeout: true
+    - variables:
+        clip: '{{ door_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+    - action: media_player.play_media
+      target:
+        entity_id: '{{ speakers }}'
+      data:
+        media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+        media_content_type: music
+      continue_on_error: true
+    - delay:
+        seconds: 2
+    - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+      timeout:
+        seconds: 60
+      continue_on_timeout: true
+  - wait_template: '{{ is_state(job, ''finish'') or is_state(machine, ''stop'') }}'
+    timeout:
+      hours: 2
+    continue_on_timeout: false
+- alias: A stop right at the end still counts as a finish
+  wait_template: '{{ is_state(job, ''finish'') }}'
+  timeout:
+    seconds: 30
+  continue_on_timeout: false
+- if:
+  - condition: template
+    value_template: '{{ end_on }}'
+  - condition: template
+    value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+  - condition: template
+    value_template: '{{ (end_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+  then:
+  - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+    timeout:
+      seconds: 45
+    continue_on_timeout: true
+  - variables:
+      clip: '{{ end_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+  - action: media_player.play_media
+    target:
+      entity_id: '{{ speakers }}'
+    data:
+      media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+      media_content_type: music
+    continue_on_error: true
+  - delay:
+      seconds: 2
+  - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+    timeout:
+      seconds: 60
+    continue_on_timeout: true

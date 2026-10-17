@@ -1,0 +1,825 @@
+blueprint:
+  name: Date Everything! Washford & Drysdale (washer and dryer voice lines)
+  description: |-
+    Your washer and dryer talk like Washford and Drysdale: start lines (heavy loads, cold water and delayed starts get their own), lines during the cycle, finished lines, and the two of them talking to each other when the wet clothes move to the dryer or both run at once. Made for Samsung washers and dryers in SmartThings.
+
+    The clips are not included. Make them with the free cutting tool and upload them to Media > My media > date_everything. Guide: https://github.com/SeriousBug/date-everything-home-assistant
+  domain: automation
+  author: Ari Barmore-Genc
+  homeassistant:
+    min_version: 2024.10.0
+  source_url: https://github.com/SeriousBug/date-everything-home-assistant/blob/main/blueprints/automation/washford_drysdale.yaml
+  input:
+    washer_machine:
+      name: Washer machine state
+      description: Washford's SmartThings "Machine state" sensor.
+      selector:
+        entity:
+          filter:
+            domain: sensor
+    washer_job:
+      name: Washer job state
+      description: Washford's SmartThings "Job state" sensor.
+      selector:
+        entity:
+          filter:
+            domain: sensor
+    dryer_machine:
+      name: Dryer machine state
+      description: Drysdale's SmartThings "Machine state" sensor.
+      selector:
+        entity:
+          filter:
+            domain: sensor
+    dryer_job:
+      name: Dryer job state
+      description: Drysdale's SmartThings "Job state" sensor.
+      selector:
+        entity:
+          filter:
+            domain: sensor
+    speakers:
+      name: Speakers
+      description: Where they talk. Pick speakers near the laundry.
+      selector:
+        entity:
+          filter:
+            domain: media_player
+          multiple: true
+    options:
+      name: Options
+      icon: mdi:washing-machine
+      input:
+        soil:
+          name: Washer soil level (optional)
+          description: Plays the "heavy" lines for heavy loads.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: select
+        water_temp:
+          name: Washer water temperature (optional)
+          description: Adds the cold-water line.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: select
+        start_on:
+          name: Start lines
+          default: true
+          selector:
+            boolean: {}
+        stage_on:
+          name: Stage lines (wash, spin, cooling, wrinkle care, pause)
+          default: true
+          selector:
+            boolean: {}
+        duo_on:
+          name: Washford and Drysdale talk to each other
+          default: true
+          selector:
+            boolean: {}
+        end_on:
+          name: Finished lines
+          default: true
+          selector:
+            boolean: {}
+        folder:
+          name: Clip folder
+          description: Folder in Media > My media where you uploaded the clips.
+          default: date_everything
+          selector:
+            text: {}
+    washford:
+      name: Washford's lines
+      icon: mdi:account-voice
+      collapsed: true
+      input:
+        w_start:
+          name: Start
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_start_obtained_a_stain.mp3, washford_start_wash_away_your_cares.mp3, washford_start_to_wash_to_bathe.mp3, washford_start_deep_water.mp3, washford_start_dirty_laundry.mp3, washford_start_weary_traveler.mp3, washford_start_you_are_returned.mp3, washford_start_weight_on_my_drum.mp3
+          selector:
+            text:
+              multiline: true
+        w_heavy:
+          name: Heavy load start
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_heavy_dirt_of_life.mp3, washford_heavy_absolved.mp3
+          selector:
+            text:
+              multiline: true
+        w_cold:
+          name: Cold water (after the start line)
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_cold_without_heat.mp3
+          selector:
+            text:
+              multiline: true
+        w_delay:
+          name: Delayed start
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_delay_wait_until_you_return.mp3, washford_delay_readiness.mp3
+          selector:
+            text:
+              multiline: true
+        w_wash:
+          name: Washing
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_wash_filled_with_water.mp3, washford_wash_drop_of_water.mp3
+          selector:
+            text:
+              multiline: true
+        w_spin:
+          name: Spinning
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_spin_whoosh.mp3, washford_spin_swift_smooth_strong.mp3, washford_spin_we_would_fly.mp3
+          selector:
+            text:
+              multiline: true
+        w_pause:
+          name: Paused
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_pause_patience.mp3
+          selector:
+            text:
+              multiline: true
+        w_end:
+          name: Finished
+          description: File names, separated by commas. One is picked at random each time.
+          default: washford_end_moving_things.mp3, washford_end_spinning_cycles.mp3, washford_end_walk_cleanly.mp3, washford_end_talk_to_drysdale.mp3, washford_end_hurry_back.mp3, washford_end_farewell_friend.mp3
+          selector:
+            text:
+              multiline: true
+    drysdale:
+      name: Drysdale's lines
+      icon: mdi:account-voice
+      collapsed: true
+      input:
+        d_start:
+          name: Start
+          description: File names, separated by commas. One is picked at random each time.
+          default: drysdale_start_cherub_returned.mp3, drysdale_start_dont_bore_me.mp3, drysdale_start_vibrating.mp3, drysdale_start_giddy_up.mp3, drysdale_start_buckle_up.mp3, drysdale_start_away_we_go.mp3, drysdale_start_magnificent.mp3, drysdale_start_tremendous_heat.mp3, drysdale_start_heat_somewhere.mp3
+          selector:
+            text:
+              multiline: true
+        d_cool:
+          name: Cooling down
+          description: File names, separated by commas. One is picked at random each time.
+          default: drysdale_cool_heat_of_moment.mp3
+          selector:
+            text:
+              multiline: true
+        d_wrinkle:
+          name: Wrinkle care
+          description: File names, separated by commas. One is picked at random each time.
+          default: drysdale_wrinkle_twist_turn.mp3
+          selector:
+            text:
+              multiline: true
+        d_pause:
+          name: Paused / door opened
+          description: File names, separated by commas. One is picked at random each time.
+          default: drysdale_pause_drying_out.mp3
+          selector:
+            text:
+              multiline: true
+        d_end:
+          name: Finished
+          description: File names, separated by commas. One is picked at random each time.
+          default: drysdale_end_clothing_clings.mp3, drysdale_end_garments_intimately.mp3, drysdale_end_better_shape.mp3, drysdale_end_points_all_around.mp3, drysdale_end_bring_chardonnay.mp3, drysdale_end_generosity.mp3, drysdale_end_dryer_sheets.mp3, drysdale_end_love_washford.mp3
+          selector:
+            text:
+              multiline: true
+    duo:
+      name: Duo lines
+      icon: mdi:account-multiple
+      collapsed: true
+      input:
+        duo_handoff:
+          name: Wet clothes go from Washford to Drysdale
+          description: File names, separated by commas. One is picked at random each time.
+          default: duo_handoff_come_drysdale.mp3, duo_handoff_cheeky_monkey.mp3
+          selector:
+            text:
+              multiline: true
+        duo_both:
+          name: Both running at once
+          description: File names, separated by commas. One is picked at random each time.
+          default: duo_both_funny_little_pair.mp3, duo_both_flirt_and_poet.mp3
+          selector:
+            text:
+              multiline: true
+    hours:
+      name: Quiet hours
+      icon: mdi:sleep
+      collapsed: true
+      input:
+        awake_from:
+          name: Talk from (weekdays)
+          default: 09:00:00
+          selector:
+            time: {}
+        weekend_awake_from:
+          name: Talk from (Saturday and Sunday)
+          default: '11:00:00'
+          selector:
+            time: {}
+        awake_until:
+          name: Stop talking at
+          description: Can be after midnight, like 03:00.
+          default: 03:00:00
+          selector:
+            time: {}
+mode: queued
+max: 10
+max_exceeded: silent
+triggers:
+- trigger: state
+  entity_id: !input 'washer_machine'
+  from: stop
+  to: run
+  id: washer_run
+- trigger: state
+  entity_id: !input 'washer_job'
+  from: delay_wash
+  not_to:
+  - none
+  - unknown
+  - unavailable
+  - delay_wash
+  id: washer_run
+- trigger: state
+  entity_id: !input 'washer_job'
+  to:
+  - wash
+  - ai_wash
+  id: washer_wash
+- trigger: state
+  entity_id: !input 'washer_job'
+  to:
+  - spin
+  - ai_spin
+  id: washer_spin
+- trigger: state
+  entity_id: !input 'washer_machine'
+  from: run
+  to: pause
+  id: washer_pause
+- trigger: state
+  entity_id: !input 'washer_job'
+  to: finish
+  id: washer_end
+- trigger: state
+  entity_id: !input 'dryer_machine'
+  from: stop
+  to: run
+  id: dryer_run
+- trigger: state
+  entity_id: !input 'dryer_job'
+  to: cooling
+  id: dryer_cool
+- trigger: state
+  entity_id: !input 'dryer_job'
+  to: wrinkle_prevent
+  id: dryer_wrinkle
+- trigger: state
+  entity_id: !input 'dryer_machine'
+  from: run
+  to: pause
+  id: dryer_pause
+- trigger: state
+  entity_id: !input 'dryer_job'
+  to: finished
+  id: dryer_end
+variables:
+  speakers: !input 'speakers'
+  folder: !input 'folder'
+  awake_from: !input 'awake_from'
+  weekend_awake_from: !input 'weekend_awake_from'
+  awake_until: !input 'awake_until'
+  wm: !input 'washer_machine'
+  wj: !input 'washer_job'
+  dm: !input 'dryer_machine'
+  dj: !input 'dryer_job'
+  soil: !input 'soil'
+  water_temp: !input 'water_temp'
+  start_on: !input 'start_on'
+  stage_on: !input 'stage_on'
+  duo_on: !input 'duo_on'
+  end_on: !input 'end_on'
+  w_start: !input 'w_start'
+  w_heavy: !input 'w_heavy'
+  w_cold: !input 'w_cold'
+  w_delay: !input 'w_delay'
+  w_wash: !input 'w_wash'
+  w_spin: !input 'w_spin'
+  w_pause: !input 'w_pause'
+  w_end: !input 'w_end'
+  d_start: !input 'd_start'
+  d_cool: !input 'd_cool'
+  d_wrinkle: !input 'd_wrinkle'
+  d_pause: !input 'd_pause'
+  d_end: !input 'd_end'
+  duo_handoff: !input 'duo_handoff'
+  duo_both: !input 'duo_both'
+actions:
+- choose:
+  - conditions:
+    - condition: trigger
+      id: washer_run
+    sequence:
+    - delay:
+        seconds: 20
+    - alias: Only a real cycle (powering on with no cycle stays silent)
+      condition: template
+      value_template: '{{ states(wj) not in [''none'', ''finish'', ''unknown'', ''unavailable''] }}'
+    - condition: template
+      value_template: '{{ start_on }}'
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ is_state(wj, ''delay_wash'') }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+          - condition: template
+            value_template: '{{ (w_delay | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+          then:
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 45
+            continue_on_timeout: true
+          - variables:
+              clip: '{{ w_delay.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+          - action: media_player.play_media
+            target:
+              entity_id: '{{ speakers }}'
+            data:
+              media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+              media_content_type: music
+            continue_on_error: true
+          - delay:
+              seconds: 2
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 60
+            continue_on_timeout: true
+      - conditions:
+        - condition: template
+          value_template: '{{ duo_on and states(dm) in [''run'', ''pause''] and states(dj) not in [''none'', ''finished'', ''unknown'', ''unavailable''] }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+          - condition: template
+            value_template: '{{ (duo_both | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+          then:
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 45
+            continue_on_timeout: true
+          - variables:
+              clip: '{{ duo_both.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+          - action: media_player.play_media
+            target:
+              entity_id: '{{ speakers }}'
+            data:
+              media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+              media_content_type: music
+            continue_on_error: true
+          - delay:
+              seconds: 2
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 60
+            continue_on_timeout: true
+      - conditions:
+        - condition: template
+          value_template: '{{ soil != '''' and states(soil) in [''heavy'', ''extra_heavy''] }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+          - condition: template
+            value_template: '{{ (w_heavy | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+          then:
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 45
+            continue_on_timeout: true
+          - variables:
+              clip: '{{ w_heavy.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+          - action: media_player.play_media
+            target:
+              entity_id: '{{ speakers }}'
+            data:
+              media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+              media_content_type: music
+            continue_on_error: true
+          - delay:
+              seconds: 2
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 60
+            continue_on_timeout: true
+      default:
+      - if:
+        - condition: template
+          value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+        - condition: template
+          value_template: '{{ (w_start | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+        then:
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 45
+          continue_on_timeout: true
+        - variables:
+            clip: '{{ w_start.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+        - action: media_player.play_media
+          target:
+            entity_id: '{{ speakers }}'
+          data:
+            media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+            media_content_type: music
+          continue_on_error: true
+        - delay:
+            seconds: 2
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 60
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ water_temp != '''' and states(water_temp) in [''cold'', ''cool'', ''tap_cold''] }}'
+        - condition: template
+          value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+        - condition: template
+          value_template: '{{ (w_cold | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+        then:
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 45
+          continue_on_timeout: true
+        - variables:
+            clip: '{{ w_cold.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+        - action: media_player.play_media
+          target:
+            entity_id: '{{ speakers }}'
+          data:
+            media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+            media_content_type: music
+          continue_on_error: true
+        - delay:
+            seconds: 2
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 60
+          continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: washer_wash
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ stage_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (w_wash | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ w_wash.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: washer_spin
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ stage_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (w_spin | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ w_spin.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: washer_pause
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ stage_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (w_pause | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ w_pause.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: washer_end
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ end_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (w_end | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ w_end.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: dryer_run
+    sequence:
+    - delay:
+        seconds: 10
+    - alias: Only a real drying cycle
+      condition: template
+      value_template: '{{ states(dj) not in [''none'', ''finished'', ''unknown'', ''unavailable''] }}'
+    - condition: template
+      value_template: '{{ start_on }}'
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ duo_on and not (states(wm) in [''run'', ''pause''] and states(wj) not in [''none'', ''finish'', ''unknown'', ''unavailable'', ''delay_wash'']) and states[wm] is not none and (now() - states[wm].last_changed).total_seconds() < 5400 }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+          - condition: template
+            value_template: '{{ (duo_handoff | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+          then:
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 45
+            continue_on_timeout: true
+          - variables:
+              clip: '{{ duo_handoff.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+          - action: media_player.play_media
+            target:
+              entity_id: '{{ speakers }}'
+            data:
+              media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+              media_content_type: music
+            continue_on_error: true
+          - delay:
+              seconds: 2
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 60
+            continue_on_timeout: true
+      - conditions:
+        - condition: template
+          value_template: '{{ duo_on and states(wm) in [''run'', ''pause''] and states(wj) not in [''none'', ''finish'', ''unknown'', ''unavailable'', ''delay_wash''] }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+          - condition: template
+            value_template: '{{ (duo_both | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+          then:
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 45
+            continue_on_timeout: true
+          - variables:
+              clip: '{{ duo_both.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+          - action: media_player.play_media
+            target:
+              entity_id: '{{ speakers }}'
+            data:
+              media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+              media_content_type: music
+            continue_on_error: true
+          - delay:
+              seconds: 2
+          - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+            timeout:
+              seconds: 60
+            continue_on_timeout: true
+      default:
+      - if:
+        - condition: template
+          value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+        - condition: template
+          value_template: '{{ (d_start | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+        then:
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 45
+          continue_on_timeout: true
+        - variables:
+            clip: '{{ d_start.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+        - action: media_player.play_media
+          target:
+            entity_id: '{{ speakers }}'
+          data:
+            media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+            media_content_type: music
+          continue_on_error: true
+        - delay:
+            seconds: 2
+        - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+          timeout:
+            seconds: 60
+          continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: dryer_cool
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ stage_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (d_cool | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ d_cool.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: dryer_wrinkle
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ stage_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (d_wrinkle | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ d_wrinkle.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: dryer_pause
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ stage_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (d_pause | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ d_pause.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: dryer_end
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ end_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (d_end | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ d_end.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true

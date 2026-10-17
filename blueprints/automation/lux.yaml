@@ -1,0 +1,315 @@
+blueprint:
+  name: Date Everything! Lux (light voice lines)
+  description: |-
+    Lux, the ring light influencer, comments when your lights turn on, off, brighter or dimmer, and complains when one has been offline for too long. They talk on the speaker in the light's room. By default only voice commands set them off, so flipping a wall switch stays quiet.
+
+    The clips are not included. Make them with the free cutting tool and upload them to Media > My media > date_everything. Guide: https://github.com/SeriousBug/date-everything-home-assistant
+  domain: automation
+  author: Ari Barmore-Genc
+  homeassistant:
+    min_version: 2024.10.0
+  source_url: https://github.com/SeriousBug/date-everything-home-assistant/blob/main/blueprints/automation/lux.yaml
+  input:
+    lights:
+      name: Lights
+      description: Lights (or light switches) Lux comments on.
+      selector:
+        entity:
+          filter:
+          - domain: light
+          - domain: switch
+          multiple: true
+    speakers:
+      name: Speakers
+      description: 'Lux talks on the speaker in the same room as the light: same area, or the room name in the speaker''s name ("Living Room speaker"). Rooms without one use the fallback below, or stay quiet.'
+      selector:
+        entity:
+          filter:
+            domain: media_player
+          multiple: true
+    options:
+      name: Options
+      icon: mdi:ring-light
+      input:
+        fallback_speakers:
+          name: Speaker for lights in rooms without a speaker (optional)
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: media_player
+              multiple: true
+        who:
+          name: Who makes Lux talk
+          description: Wall switches are always ignored by the first two choices.
+          default: voice
+          selector:
+            select:
+              mode: list
+              options:
+              - value: voice
+                label: Only voice commands (needs the user ID below)
+              - value: people
+                label: Voice, the app and automations (not wall switches)
+              - value: everything
+                label: Everything, wall switches included
+        voice_user:
+          name: Voice assistant user ID
+          description: 'For Google Assistant or Alexa through Home Assistant Cloud: Settings > People > Users (turn on Advanced mode in your profile), open "Home Assistant Cloud" and copy its ID.'
+          default: ''
+          selector:
+            text: {}
+        onoff_on:
+          name: On and off lines
+          default: true
+          selector:
+            boolean: {}
+        bright_on:
+          name: Brighter and dimmer lines
+          default: true
+          selector:
+            boolean: {}
+        offline_on:
+          name: Offline lines
+          default: true
+          selector:
+            boolean: {}
+          description: When a light can't be reached for a while.
+        offline_minutes:
+          name: Offline line after
+          default: 60
+          selector:
+            number:
+              min: 10
+              max: 720
+              step: 1
+              unit_of_measurement: min
+              mode: box
+        cooldown:
+          name: Seconds between lines
+          default: 20
+          selector:
+            number:
+              min: 0
+              max: 300
+              step: 1
+              unit_of_measurement: s
+              mode: box
+          description: '"Turn off everything" shouldn''t get 12 lines in a row.'
+        folder:
+          name: Clip folder
+          description: Folder in Media > My media where you uploaded the clips.
+          default: date_everything
+          selector:
+            text: {}
+    lines:
+      name: Voice lines
+      icon: mdi:account-voice
+      collapsed: true
+      input:
+        on_clips:
+          name: Light turned on
+          description: File names, separated by commas. One is picked at random each time.
+          default: lux_on_better_lighting.mp3, lux_on_brightest_example.mp3, lux_on_hi_luxies.mp3, lux_on_inner_light.mp3, lux_on_its_about_lights.mp3, lux_on_its_me_again.mp3, lux_on_let_your_light_shine.mp3, lux_on_light_shine_out.mp3, lux_on_light_up_lives.mp3, lux_on_luminescence.mp3, lux_on_more_beautiful.mp3, lux_on_on_all_the_time.mp3, lux_on_shine_bright.mp3, lux_on_shine_on_luxie.mp3, lux_on_speed_of_light.mp3, lux_on_that_essential.mp3, lux_on_whats_up.mp3, lux_on_you_again.mp3
+          selector:
+            text:
+              multiline: true
+        off_clips:
+          name: Light turned off
+          description: File names, separated by commas. One is picked at random each time.
+          default: lux_off_bored_with_you.mp3, lux_off_come_see_me.mp3, lux_off_dimmer_switch.mp3, lux_off_dimmy_move.mp3, lux_off_go_to_sleep.mp3, lux_off_in_charge.mp3, lux_off_next_date.mp3, lux_off_on_again_off_again.mp3, lux_off_see_you_around.mp3, lux_off_six_parties.mp3, lux_off_stay_golden.mp3, lux_off_switch_yourself_off.mp3, lux_off_total_disregard.mp3
+          selector:
+            text:
+              multiline: true
+        brighter_clips:
+          name: Made brighter
+          description: File names, separated by commas. One is picked at random each time.
+          default: lux_on_better_lighting.mp3, lux_on_brightest_example.mp3, lux_on_light_shine_out.mp3, lux_on_shine_bright.mp3, lux_on_inner_light.mp3, lux_on_more_beautiful.mp3
+          selector:
+            text:
+              multiline: true
+        dimmer_clips:
+          name: Made dimmer
+          description: File names, separated by commas. One is picked at random each time.
+          default: lux_off_dimmer_switch.mp3, lux_off_dimmy_move.mp3, lux_off_total_disregard.mp3, lux_off_go_to_sleep.mp3, lux_offline_badly_treated.mp3
+          selector:
+            text:
+              multiline: true
+        offline_clips:
+          name: Light offline
+          description: File names, separated by commas. One is picked at random each time.
+          default: lux_offline_almost_dead.mp3, lux_offline_badly_treated.mp3, lux_offline_wifi_sucks.mp3, lux_offline_wish_i_could_help.mp3
+          selector:
+            text:
+              multiline: true
+    hours:
+      name: Quiet hours
+      icon: mdi:sleep
+      collapsed: true
+      input:
+        awake_from:
+          name: Talk from (weekdays)
+          default: 09:00:00
+          selector:
+            time: {}
+        weekend_awake_from:
+          name: Talk from (Saturday and Sunday)
+          default: '11:00:00'
+          selector:
+            time: {}
+        awake_until:
+          name: Stop talking at
+          description: Can be after midnight, like 03:00.
+          default: 03:00:00
+          selector:
+            time: {}
+mode: single
+max_exceeded: silent
+triggers:
+- trigger: state
+  entity_id: !input 'lights'
+  from:
+  - 'on'
+  - 'off'
+  to:
+  - 'on'
+  - 'off'
+  id: change
+- trigger: state
+  entity_id: !input 'lights'
+  attribute: brightness
+  id: bright
+- trigger: state
+  entity_id: !input 'lights'
+  to: unavailable
+  for:
+    minutes: !input 'offline_minutes'
+  id: offline
+variables:
+  speakers: !input 'speakers'
+  folder: !input 'folder'
+  awake_from: !input 'awake_from'
+  weekend_awake_from: !input 'weekend_awake_from'
+  awake_until: !input 'awake_until'
+  fallback_speakers: !input 'fallback_speakers'
+  who: !input 'who'
+  voice_user: !input 'voice_user'
+  onoff_on: !input 'onoff_on'
+  bright_on: !input 'bright_on'
+  offline_on: !input 'offline_on'
+  on_clips: !input 'on_clips'
+  off_clips: !input 'off_clips'
+  brighter_clips: !input 'brighter_clips'
+  dimmer_clips: !input 'dimmer_clips'
+  offline_clips: !input 'offline_clips'
+actions:
+- variables:
+    spk: '{% set a = area_id(trigger.entity_id) %}{% set ns = namespace(here=[]) %}{% if a %}{% set an = (area_name(a) or '''') | lower %}{% for s in speakers %}{% if area_id(s) == a or (an != '''' and an in (state_attr(s, ''friendly_name'') or s) | lower) %}{% set ns.here = ns.here + [s] %}{% endif %}{% endfor %}{% endif %}{{ ns.here if ns.here else fallback_speakers }}'
+- condition: template
+  value_template: '{{ spk | count > 0 }}'
+- choose:
+  - conditions:
+    - condition: trigger
+      id: change
+    - condition: template
+      value_template: '{% set c = trigger.to_state.context %}{% if who == ''everything'' %}true{% elif who == ''voice'' %}{{ voice_user != '''' and c.user_id == voice_user }}{% else %}{{ c.user_id is not none or c.parent_id is not none }}{% endif %}'
+    sequence:
+    - variables:
+        pool: '{{ on_clips if trigger.to_state.state == ''on'' else off_clips }}'
+    - if:
+      - condition: template
+        value_template: '{{ onoff_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (pool | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ spk | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ pool.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ spk }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ spk | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: bright
+    - condition: template
+      value_template: '{{ trigger.from_state.state == ''on'' and trigger.to_state.state == ''on'' and trigger.from_state.attributes.brightness is number and trigger.to_state.attributes.brightness is number and (trigger.to_state.attributes.brightness - trigger.from_state.attributes.brightness) | abs >= 13 }}'
+    - condition: template
+      value_template: '{% set c = trigger.to_state.context %}{% if who == ''everything'' %}true{% elif who == ''voice'' %}{{ voice_user != '''' and c.user_id == voice_user }}{% else %}{{ c.user_id is not none or c.parent_id is not none }}{% endif %}'
+    sequence:
+    - variables:
+        pool: '{{ brighter_clips if trigger.to_state.attributes.brightness > trigger.from_state.attributes.brightness else dimmer_clips }}'
+    - if:
+      - condition: template
+        value_template: '{{ bright_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (pool | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ spk | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ pool.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ spk }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ spk | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: offline
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ offline_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (offline_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ spk | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ offline_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ spk }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ spk | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+- delay:
+    seconds: !input 'cooldown'

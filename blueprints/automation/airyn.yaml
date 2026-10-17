@@ -1,0 +1,474 @@
+blueprint:
+  name: Date Everything! Airyn (thermostat voice lines)
+  description: |-
+    Your thermostat talks like Airyn, kept quiet on purpose: lines when it switches between heating and cooling, when the air gets too dry or humid, when it drops offline and comes back, and filter reminders. Nothing for normal heating and cooling runs. Works with any thermostat in Home Assistant (made with a Google Nest).
+
+    The clips are not included. Make them with the free cutting tool and upload them to Media > My media > date_everything. Guide: https://github.com/SeriousBug/date-everything-home-assistant
+  domain: automation
+  author: Ari Barmore-Genc
+  homeassistant:
+    min_version: 2024.10.0
+  source_url: https://github.com/SeriousBug/date-everything-home-assistant/blob/main/blueprints/automation/airyn.yaml
+  input:
+    thermostat:
+      name: Thermostat
+      description: Airyn's climate entity.
+      selector:
+        entity:
+          filter:
+            domain: climate
+    speakers:
+      name: Speakers
+      description: Where Airyn talks. One room is plenty, she's dramatic.
+      selector:
+        entity:
+          filter:
+            domain: media_player
+          multiple: true
+    options:
+      name: Options
+      icon: mdi:thermostat
+      input:
+        mode_on:
+          name: Heat / cool switch lines
+          default: true
+          selector:
+            boolean: {}
+        humidity_on:
+          name: Too dry / too humid lines
+          default: true
+          selector:
+            boolean: {}
+        dry_below:
+          name: Too dry below
+          default: 30
+          selector:
+            number:
+              min: 10
+              max: 50
+              step: 1
+              unit_of_measurement: '%'
+              mode: box
+        humid_above:
+          name: Too humid above
+          default: 60
+          selector:
+            number:
+              min: 40
+              max: 90
+              step: 1
+              unit_of_measurement: '%'
+              mode: box
+        offline_on:
+          name: Offline and back online lines
+          default: true
+          selector:
+            boolean: {}
+        skip_eco:
+          name: Stay quiet while in Eco mode
+          default: true
+          selector:
+            boolean: {}
+          description: Eco usually means nobody's home.
+        filter_on:
+          name: Filter reminders
+          default: true
+          selector:
+            boolean: {}
+        filter_date:
+          name: Filter last changed (optional)
+          description: A Date helper you create (Settings > Devices & services > Helpers > Date and/or time). Needed for filter reminders.
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: input_datetime
+        filter_days:
+          name: Change the filter every
+          default: 90
+          selector:
+            number:
+              min: 14
+              max: 365
+              step: 1
+              unit_of_measurement: days
+              mode: box
+        filter_repeat:
+          name: Remind again every
+          default: 7
+          selector:
+            number:
+              min: 1
+              max: 30
+              step: 1
+              unit_of_measurement: days
+              mode: box
+        filter_time:
+          name: Filter reminder time
+          default: '19:00:00'
+          selector:
+            time: {}
+        filter_button:
+          name: '"Filter replaced" button (optional)'
+          description: 'A Button helper. Press it after a new filter: it resets the date and Airyn thanks you.'
+          default: ''
+          selector:
+            entity:
+              filter:
+                domain: input_button
+        folder:
+          name: Clip folder
+          description: Folder in Media > My media where you uploaded the clips.
+          default: date_everything
+          selector:
+            text: {}
+    lines:
+      name: Voice lines
+      icon: mdi:account-voice
+      collapsed: true
+      input:
+        heat_clips:
+          name: Switched to heat
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_heat_making_me_cold.mp3, airyn_mode_i_am_airyn.mp3, airyn_mode_breathe_me.mp3
+          selector:
+            text:
+              multiline: true
+        cool_clips:
+          name: Switched to cool
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_mode_shift_with_wind.mp3, airyn_mode_i_am_airyn.mp3
+          selector:
+            text:
+              multiline: true
+        change_clips:
+          name: Switched to heat + cool
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_mode_i_am_airyn.mp3, airyn_mode_breathe_me.mp3, airyn_mode_shift_with_wind.mp3
+          selector:
+            text:
+              multiline: true
+        air_clips:
+          name: Too dry or too humid
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_air_breathe_child.mp3, airyn_air_always_listening.mp3, airyn_air_admixture.mp3
+          selector:
+            text:
+              multiline: true
+        offline_clips:
+          name: Offline
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_offline_gasping.mp3
+          selector:
+            text:
+              multiline: true
+        online_clips:
+          name: Back online
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_online_accompany.mp3, airyn_online_you_return.mp3
+          selector:
+            text:
+              multiline: true
+        filter_clips:
+          name: Filter is due
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_filter_not_nearly_enough.mp3, airyn_filter_instill_panic.mp3, airyn_filter_tire_of_this.mp3, airyn_filter_leave_me_be.mp3, airyn_filter_grow_weary.mp3
+          selector:
+            text:
+              multiline: true
+        filter_done_clips:
+          name: Filter replaced
+          description: File names, separated by commas. One is picked at random each time.
+          default: airyn_filter_done_make_me_anew.mp3, airyn_filter_done_well_done.mp3, airyn_filter_done_quite_impressed.mp3, airyn_filter_done_pleasure.mp3
+          selector:
+            text:
+              multiline: true
+    hours:
+      name: Quiet hours
+      icon: mdi:sleep
+      collapsed: true
+      input:
+        awake_from:
+          name: Talk from (weekdays)
+          default: 09:00:00
+          selector:
+            time: {}
+        weekend_awake_from:
+          name: Talk from (Saturday and Sunday)
+          default: '11:00:00'
+          selector:
+            time: {}
+        awake_until:
+          name: Stop talking at
+          description: Can be after midnight, like 03:00.
+          default: 03:00:00
+          selector:
+            time: {}
+mode: parallel
+max: 10
+max_exceeded: silent
+triggers:
+- trigger: state
+  entity_id: !input 'thermostat'
+  to: null
+  not_from:
+  - unavailable
+  - unknown
+  id: mode
+- trigger: state
+  entity_id: !input 'thermostat'
+  to: unavailable
+  for:
+    minutes: 10
+  id: offline
+- trigger: numeric_state
+  entity_id: !input 'thermostat'
+  attribute: current_humidity
+  below: !input 'dry_below'
+  for:
+    minutes: 30
+  id: air
+- trigger: numeric_state
+  entity_id: !input 'thermostat'
+  attribute: current_humidity
+  above: !input 'humid_above'
+  for:
+    minutes: 30
+  id: air
+- trigger: time
+  at: !input 'filter_time'
+  id: filter_check
+- trigger: event
+  event_type: state_changed
+  event_data:
+    entity_id: !input 'filter_button'
+  id: filter_reset
+variables:
+  speakers: !input 'speakers'
+  folder: !input 'folder'
+  awake_from: !input 'awake_from'
+  weekend_awake_from: !input 'weekend_awake_from'
+  awake_until: !input 'awake_until'
+  thermostat: !input 'thermostat'
+  mode_on: !input 'mode_on'
+  humidity_on: !input 'humidity_on'
+  offline_on: !input 'offline_on'
+  skip_eco: !input 'skip_eco'
+  filter_on: !input 'filter_on'
+  filter_date: !input 'filter_date'
+  filter_days: !input 'filter_days'
+  filter_repeat: !input 'filter_repeat'
+  heat_clips: !input 'heat_clips'
+  cool_clips: !input 'cool_clips'
+  change_clips: !input 'change_clips'
+  air_clips: !input 'air_clips'
+  offline_clips: !input 'offline_clips'
+  online_clips: !input 'online_clips'
+  filter_clips: !input 'filter_clips'
+  filter_done_clips: !input 'filter_done_clips'
+actions:
+- choose:
+  - conditions:
+    - condition: trigger
+      id: mode
+    - condition: template
+      value_template: '{{ trigger.from_state.state in [''heat'', ''cool'', ''heat_cool''] and trigger.to_state.state in [''heat'', ''cool'', ''heat_cool''] }}'
+    sequence:
+    - variables:
+        pool: '{{ heat_clips if trigger.to_state.state == ''heat'' else (cool_clips if trigger.to_state.state == ''cool'' else change_clips) }}'
+    - if:
+      - condition: template
+        value_template: '{{ mode_on and not (skip_eco and state_attr(thermostat, ''preset_mode'') == ''eco'') }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (pool | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ pool.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: offline
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ offline_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (offline_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ offline_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+    - wait_for_trigger:
+      - trigger: state
+        entity_id: !input 'thermostat'
+        from: unavailable
+      timeout:
+        days: 7
+      continue_on_timeout: false
+    - if:
+      - condition: template
+        value_template: '{{ offline_on and not (skip_eco and state_attr(thermostat, ''preset_mode'') == ''eco'') }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (online_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ online_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: air
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ humidity_on and not (skip_eco and state_attr(thermostat, ''preset_mode'') == ''eco'') }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (air_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ air_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: filter_check
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ filter_on and not (skip_eco and state_attr(thermostat, ''preset_mode'') == ''eco'') and filter_date != '''' and states(filter_date) not in [''unknown'', ''unavailable'', ''''] and ((now().date() - (states(filter_date) | as_datetime).date()).days - filter_days) >= 0 and ((now().date() - (states(filter_date) | as_datetime).date()).days - filter_days) % filter_repeat == 0 }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (filter_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ filter_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
+  - conditions:
+    - condition: trigger
+      id: filter_reset
+    - condition: template
+      value_template: '{{ trigger.event.data.old_state is not none and trigger.event.data.new_state is not none and trigger.event.data.old_state.state not in [''unavailable''] and trigger.event.data.new_state.state not in [''unavailable'', ''unknown''] and trigger.event.data.old_state.state != trigger.event.data.new_state.state }}'
+    sequence:
+    - if:
+      - condition: template
+        value_template: '{{ filter_date != '''' }}'
+      then:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: '{{ filter_date }}'
+        data:
+          date: '{{ now().date() | string }}'
+    - if:
+      - condition: template
+        value_template: '{{ filter_on }}'
+      - condition: template
+        value_template: '{% set n = now().strftime(''%H:%M:%S'') %}{% set s = weekend_awake_from if now().weekday() >= 5 else awake_from %}{% if s <= awake_until %}{{ s <= n < awake_until }}{% else %}{{ n >= s or n < awake_until }}{% endif %}'
+      - condition: template
+        value_template: '{{ (filter_done_clips | default('''')).split('','') | map(''trim'') | reject(''eq'', '''') | list | count > 0 }}'
+      then:
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 45
+        continue_on_timeout: true
+      - variables:
+          clip: '{{ filter_done_clips.split('','') | map(''trim'') | reject(''eq'', '''') | list | random }}'
+      - action: media_player.play_media
+        target:
+          entity_id: '{{ speakers }}'
+        data:
+          media_content_id: media-source://media_source/local/{{ folder }}/{{ clip }}
+          media_content_type: music
+        continue_on_error: true
+      - delay:
+          seconds: 2
+      - wait_template: '{{ speakers | select(''is_state'', ''playing'') | list | count == 0 }}'
+        timeout:
+          seconds: 60
+        continue_on_timeout: true
